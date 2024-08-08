@@ -275,76 +275,6 @@ debing() {
     KERNEL_VERSION=$(make kernelversion)
     ARCH=$(dpkg --print-architecture)
 
-    # Kernel package variables
-    KERNEL_PKG_NAME=custom-kernel-${KERNEL_VERSION}
-    KERNEL_PKG_VERSION=${KERNEL_VERSION}-1
-    KERNEL_PKG_DIR=${KERNEL_PKG_NAME}-${KERNEL_PKG_VERSION}
-
-    # Headers package variables
-    HEADERS_PKG_NAME=custom-kernel-headers-${KERNEL_VERSION}
-    HEADERS_PKG_VERSION=${KERNEL_VERSION}-1
-    HEADERS_PKG_DIR=${HEADERS_PKG_NAME}-${HEADERS_PKG_VERSION}
-
-    # Function to create kernel package
-    package_kernel() {
-        # Create directory structure for kernel package
-        mkdir -p ${KERNEL_PKG_DIR}/DEBIAN
-        mkdir -p ${KERNEL_PKG_DIR}/boot
-        mkdir -p ${KERNEL_PKG_DIR}/lib/modules/${KERNEL_VERSION}
-        mkdir -p ${KERNEL_PKG_DIR}/usr/share/doc/${KERNEL_PKG_NAME}
-
-        # Create control file for kernel package
-        cat >${KERNEL_PKG_DIR}/DEBIAN/control <<EOF
-Package: ${KERNEL_PKG_NAME}
-Version: ${KERNEL_PKG_VERSION}
-Section: kernel
-Priority: optional
-Architecture: ${ARCH}
-Maintainer: CachyOs
-Description: Custom compiled Linux Kernel
- Custom compiled Linux Kernel ${KERNEL_VERSION}
-EOF
-
-        # Copy the compiled kernel and modules
-        cp arch/x86/boot/bzImage ${KERNEL_PKG_DIR}/boot/vmlinuz-${KERNEL_VERSION}
-        cp -a /tmp/kernel-modules/lib/modules/${KERNEL_VERSION}/* ${KERNEL_PKG_DIR}/lib/modules/${KERNEL_VERSION}/
-        cp System.map ${KERNEL_PKG_DIR}/boot/System.map-${KERNEL_VERSION}
-        cp .config ${KERNEL_PKG_DIR}/boot/config-${KERNEL_VERSION}
-
-        # Package the kernel
-        fakeroot dpkg-deb --build ${KERNEL_PKG_DIR}
-
-        # Clean up kernel package directory
-        rm -rf ${KERNEL_PKG_DIR}
-    }
-
-    # Function to create headers package
-    package_headers() {
-        # Create directory structure for headers package
-        mkdir -p ${HEADERS_PKG_DIR}/DEBIAN
-        mkdir -p ${HEADERS_PKG_DIR}/usr/src/linux-headers-${KERNEL_VERSION}
-
-        # Create control file for headers package
-        cat >${HEADERS_PKG_DIR}/DEBIAN/control <<EOF
-Package: ${HEADERS_PKG_NAME}
-Version: ${HEADERS_PKG_VERSION}
-Section: kernel
-Priority: optional
-Architecture: ${ARCH}
-Maintainer: CachyOs
-Description: Headers for custom compiled Linux Kernel ${KERNEL_VERSION}
-EOF
-
-        # Copy the kernel headers
-        make headers_install INSTALL_HDR_PATH=${HEADERS_PKG_DIR}/usr/src/linux-headers-${KERNEL_VERSION}
-
-        # Package the headers
-        fakeroot dpkg-deb --build ${HEADERS_PKG_DIR}
-
-        # Clean up headers package directory
-        rm -rf ${HEADERS_PKG_DIR}
-    }
-
     package_zfs() {
 
         ZFS_PKG_DIR=zfs-${KERNEL_VERSION}
@@ -355,7 +285,7 @@ EOF
         # Create control file for ZFS package
         cat >zfs-${KERNEL_VERSION}/DEBIAN/control <<EOF
 Package: zfs-${KERNEL_VERSION}
-Version: ${KERNEL_PKG_VERSION}
+Version: ${KERNEL_VERSION}-1
 Section: kernel
 Priority: optional
 Architecture: ${ARCH}
@@ -376,9 +306,7 @@ EOF
 
 
     # Compile the kernel and modules
-    make -j$(nproc)
-    mkdir -p /tmp/kernel-modules
-    make modules_install INSTALL_MOD_PATH=/tmp/kernel-modules
+    make bindeb-pkg -j$(nproc)
 
     if [ "$_zfs" == "yes" ]; then
         LINUX_DIR=$(pwd)
@@ -394,11 +322,6 @@ EOF
         cd $LINUX_DIR
     fi
 
-    # Package the kernel
-    package_kernel
-
-    # Package the headers
-    package_headers
     if [ "$_zfs" == "yes" ]; then
         package_zfs
     fi
