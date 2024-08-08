@@ -6,7 +6,7 @@
 _cachyos_config="CACHYOS"
 _cpusched_selection="cachyos"
 _llvm_lto_selection="none"
-_tick_rate="500"
+_tick_rate="1000"
 _numa="enable"
 _hugepage="always"
 _lru_config="standard"
