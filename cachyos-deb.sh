@@ -430,6 +430,9 @@ do_things() {
     # create empty source array of patches
     declare -a patches=()
 
+    # declare localversion
+    declare -a localversion="-cachyos"
+
     # Apply CachyOS configuration
     if [ "$_cachyos_config" == "CACHYOS" ]; then
         scripts/config -e CACHYOS
@@ -442,19 +445,24 @@ do_things() {
         patches+=("${_patchsource}/sched/0001-sched-ext.patch"
            "${_patchsource}/sched/0001-bore-cachy.patch") ;;
     bore) ## BORE Scheduler
-        patches+=("${_patchsource}/sched/0001-bore-cachy.patch") ;;
+        patches+=("${_patchsource}/sched/0001-bore-cachy.patch")
+        localversion+="-bore" ;;
     rt) ## EEVDF with RT patches
         patches+=("${_patchsource}/misc/0001-rt.patch"
-            linux-cachyos-rt.install) ;;
+            linux-cachyos-rt.install)
+        localversion+="-rt" ;;
     rt-bore) ## RT with BORE Scheduler
         patches+=("${_patchsource}/misc/0001-rt.patch"
             "${_patchsource}/sched/0001-bore-cachy-rt.patch"
-            linux-cachyos-rt.install) ;;
+            linux-cachyos-rt.install)
+        localversion+="-rt-bore" ;;
     hardened) ## Hardened Patches with BORE Scheduler
         patches+=("${_patchsource}/sched/0001-bore-cachy.patch"
-            "${_patchsource}/misc/0001-hardened.patch") ;;
+            "${_patchsource}/misc/0001-hardened.patch")
+        localversion+="-hardened" ;;
     sched-ext) ## SCHED-EXT
-        patches+=("${_patchsource}/sched/0001-sched-ext.patch") ;;
+        patches+=("${_patchsource}/sched/0001-sched-ext.patch")
+        localversion+="-sched-ext" ;;
     esac
 
     # download and apply patches on source
@@ -471,7 +479,7 @@ do_things() {
 
     # set localversion
     scripts/config -k -d CONFIG_LOCALVERSION_AUTO
-    scripts/config -k --set-val CONFIG_LOCALVERSION '"-cachyos-custom"'
+    scripts/config -k --set-val CONFIG_LOCALVERSION "\"${localversion}\""
 
     case "$_cpusched_selection" in
     cachyos) scripts/config -e SCHED_BORE -e SCHED_CLASS_EXT ;;
