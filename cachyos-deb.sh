@@ -439,7 +439,8 @@ do_things() {
     ## List of CachyOS schedulers
     case "$_cpusched_selection" in
     cachyos) # CachyOS Scheduler (BORE + SCHED-EXT)
-        patches+=("${_patchsource}/sched/0001-sched-ext.patch") ;;
+        patches+=("${_patchsource}/sched/0001-sched-ext.patch"
+           "${_patchsource}/sched/0001-bore-cachy.patch") ;;
     bore) ## BORE Scheduler
         patches+=("${_patchsource}/sched/0001-bore-cachy.patch") ;;
     rt) ## EEVDF with RT patches
@@ -463,6 +464,7 @@ do_things() {
         patch -p1 <$(basename $i)
     done
 
+
     # set architecture
     scripts/config -k --disable CONFIG_GENERIC_CPU
     scripts/config -k --enable CONFIG_${MARCH2}
@@ -471,7 +473,7 @@ do_things() {
     scripts/config -k -d CONFIG_LOCALVERSION_AUTO
     scripts/config -k --set-val CONFIG_LOCALVERSION '"-cachyos-custom"'
 
-    case "$_cpusched_config" in
+    case "$_cpusched_selection" in
     cachyos) scripts/config -e SCHED_BORE -e SCHED_CLASS_EXT ;;
     bore | hardened) scripts/config -e SCHED_BORE ;;
     eevdf) ;;
