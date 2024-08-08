@@ -467,6 +467,10 @@ do_things() {
     scripts/config -k --disable CONFIG_GENERIC_CPU
     scripts/config -k --enable CONFIG_${MARCH2}
 
+    # set localversion
+    scripts/config -k -d CONFIG_LOCALVERSION_AUTO
+    scripts/config -k --set-val CONFIG_LOCALVERSION '"-cachyos-custom"'
+
     case "$_cpusched_config" in
     cachyos) scripts/config -e SCHED_BORE -e SCHED_CLASS_EXT ;;
     bore | hardened) scripts/config -e SCHED_BORE ;;
