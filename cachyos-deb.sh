@@ -476,6 +476,16 @@ do_things() {
         scripts/config -d CPU_FREQ_DEFAULT_GOV_SCHEDUTIL -e CPU_FREQ_DEFAULT_GOV_PERFORMANCE
     fi
 
+    # Enable bbr3
+    if [ -n "$_bbr3" ]; then
+        echo "Disabling TCP_CONG_CUBIC..."
+        scripts/config -m TCP_CONG_CUBIC \
+            -d DEFAULT_CUBIC \
+            -e TCP_CONG_BBR \
+            -e DEFAULT_BBR \
+            --set-str DEFAULT_TCP_CONG bbr
+    fi
+
     echo "Configurations applied."
 
     # Make the kernel calling debing
