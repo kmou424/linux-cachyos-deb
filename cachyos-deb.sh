@@ -366,7 +366,7 @@ do_things() {
     case "$_cpusched_selection" in
     cachyos) # CachyOS Scheduler (BORE + SCHED-EXT)
         patches+=("${_patchsource}/sched/0001-sched-ext.patch"
-           "${_patchsource}/sched/0001-bore-cachy.patch") ;;
+           "${_patchsource}/sched/0001-bore-cachy-ext.patch") ;;
     bore) ## BORE Scheduler
         patches+=("${_patchsource}/sched/0001-bore-cachy.patch")
         localversion+="-bore" ;;
