@@ -306,7 +306,7 @@ EOF
 
 
     # Compile the kernel and modules
-    make bindeb-pkg -j$(nproc)
+    make bindeb-pkg -j$(nproc) 2>&1 | tee build-$(date +%Y%m%d-%H%M%S).log
 
     if [ "$_zfs" == "yes" ]; then
         LINUX_DIR=$(pwd)
